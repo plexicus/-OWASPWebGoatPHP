@@ -35,7 +35,7 @@ class ArrayType extends Type
 
     public function convertToDatabaseValue($value, \Doctrine\DBAL\Platforms\AbstractPlatform $platform)
     {
-        return serialize($value);
+        return json_encode($value);
     }
 
     public function convertToPHPValue($value, \Doctrine\DBAL\Platforms\AbstractPlatform $platform)
@@ -45,8 +45,8 @@ class ArrayType extends Type
         }
 
         $value = (is_resource($value)) ? stream_get_contents($value) : $value;
-        $val = unserialize($value);
-        if ($val === false && $value != 'b:0;') {
+        $val = json_decode($value, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
             throw ConversionException::conversionFailed($value, $this->getName());
         }
         return $val;
